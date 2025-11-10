@@ -1,17 +1,4 @@
-import {
-	BanknotesIcon,
-	ClockIcon,
-	UserGroupIcon,
-	InboxIcon,
-} from "@heroicons/react/24/outline"
-import { lusitana } from "@/app/ui/fonts"
-
-const iconMap = {
-	collected: BanknotesIcon,
-	customers: UserGroupIcon,
-	pending: ClockIcon,
-	invoices: InboxIcon,
-}
+import { lusitana } from "@/assets/font/font"
 
 export default async function CardWrapper() {
 	return (
@@ -39,12 +26,9 @@ export function Card({
 	value: number | string
 	type: "invoices" | "customers" | "pending" | "collected"
 }) {
-	const Icon = iconMap[type]
-
 	return (
 		<div className="rounded-xl bg-gray-50 p-2 shadow-sm">
 			<div className="flex p-4">
-				{Icon ? <Icon className="h-5 w-5 text-gray-700" /> : null}
 				<h3 className="ml-2 text-sm font-medium">{title}</h3>
 			</div>
 			<p
