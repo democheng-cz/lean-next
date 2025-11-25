@@ -1,3 +1,4 @@
+import { deleteInvoice } from "@/lib/actions"
 import Link from "next/link"
 
 export function CreateInvoice() {
@@ -14,18 +15,19 @@ export function CreateInvoice() {
 export function UpdateInvoice({ id }: { id: string }) {
 	return (
 		<Link
-			href="/dashboard/invoices"
+			href={`/dashboard/invoices/${id}/edit`}
 			className="rounded-md border p-2 hover:bg-gray-100"
-		></Link>
+		>
+			更新
+		</Link>
 	)
 }
 
 export function DeleteInvoice({ id }: { id: string }) {
+	const deleteInvoiceWithId = deleteInvoice.bind(null, id)
 	return (
-		<>
-			<button type="submit" className="rounded-md border p-2 hover:bg-gray-100">
-				<span className="sr-only">Delete</span>
-			</button>
-		</>
+		<form action={deleteInvoiceWithId}>
+			<button className="rounded-md border p-2 hover:bg-gray-100">删除</button>
+		</form>
 	)
 }
