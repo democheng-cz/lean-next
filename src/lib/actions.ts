@@ -6,29 +6,44 @@ import { redirect } from "next/navigation"
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" })
 
-const formSchema = z.object({
+const FormSchema = z.object({
 	id: z.string(),
-	customerId: z.string(),
+	customerId: z.string({
+		error: "Please select a customer.",
+	}),
 	amount: z.coerce
 		.number()
-		.gt(0, { message: "Please enter an amount greater than 0" }),
-	status: z.enum(["pending", "paid"]),
+		.gt(0, { message: "Please enter an amount greater than $0." }),
+	status: z.enum(["pending", "paid"], {
+		invalid_type_error: "Please select an invoice status.",
+	}),
 	date: z.string(),
 })
+const createInvoiceSchema = FormSchema.omit({ id: true, date: true })
+const updateInvoiceShema = FormSchema.omit({ id: true, date: true })
 
-const createInvoiceSchema = formSchema.omit({ id: true, date: true })
-const updateInvoiceShema = formSchema.omit({ id: true, date: true })
-
-export const createInvoice = async (formData: FormData) => {
+export const createInvoice = async (prevState: State, formData: FormData) => {
 	try {
 		const rawFormdData = {
 			customerId: formData.get("customerId"),
 			amount: formData.get("amount"),
 			status: formData.get("status"),
 		}
+		const validatedFields = createInvoiceSchema.safeParse({
+			customerId: formData.get("customerId"),
+			amount: formData.get("amount"),
+			status: formData.get("status"),
+		})
 
-		const { customerId, amount, status } =
-			createInvoiceSchema.parse(rawFormdData)
+		if (!validatedFields.success) {
+			return {
+				errors: validatedFields.error.flatten().fieldErrors,
+				message: "Missing Fields. Failed to Create Invoice.",
+			}
+		}
+		// const { customerId, amount, status } =
+		// 	createInvoiceSchema.parse(rawFormdData)
+		const { customerId, amount, status } = validatedFields.data
 		const amountInCents = amount * 100
 		const date = new Date().toISOString().split("T")[0]
 
@@ -40,6 +55,14 @@ export const createInvoice = async (formData: FormData) => {
 		console.log("error", error)
 	}
 	redirect("/dashboard/invoices")
+}
+export type State = {
+	errors?: {
+		customerId?: string[]
+		amount?: string[]
+		status?: string[]
+	}
+	message?: string | null
 }
 
 export async function updateInvoice(id: string, formData: FormData) {

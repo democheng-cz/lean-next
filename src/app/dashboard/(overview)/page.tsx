@@ -4,7 +4,6 @@ import LatestInvoices from "@/ui/dashboard/latest-invoices"
 import { lusitana } from "@/assets/font/font"
 import { Suspense } from "react"
 import {
-	CardSkeleton,
 	CardsSkeleton,
 	LatestInvoicesSkeleton,
 	RevenueChartSkeleton,
